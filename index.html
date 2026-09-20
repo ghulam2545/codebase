@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>codebase</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Inter, Segoe UI, system-ui, Arial, sans-serif;
+            background: #f6f7f9;
+            color: #111827;
+            padding: 28px;
+        }
+
+        .container {
+            max-width: 980px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+            padding: 18px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, .04);
+        }
+
+        .row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .btn {
+            appearance: none;
+            border: 0;
+            border-radius: 10px;
+            padding: 11px 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: #111827;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #000;
+        }
+
+        .btn-secondary {
+            background: #fff;
+            border: 1px solid #d1d5db;
+            color: #111827;
+        }
+
+        .btn-secondary:hover {
+            background: #f9fafb;
+        }
+
+        .btn:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+        }
+
+        .path {
+            font-family: ui-monospace, Menlo, monospace;
+            background: #f3f4f6;
+            border: 1px dashed #d1d5db;
+            border-radius: 10px;
+            padding: 10px 12px;
+            flex: 1;
+            min-width: 240px;
+            word-break: break-all;
+        }
+
+        .muted {
+            color: #6b7280;
+            font-size: 13px;
+        }
+
+        .dashboard {
+            margin-top: 20px;
+            display: none;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 12px;
+            margin-top: 14px;
+        }
+
+        .stat {
+            padding: 16px;
+            border-radius: 12px;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+        }
+
+        .stat .k {
+            font-size: 12px;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            margin-bottom: 6px;
+        }
+
+        .stat .v {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .stat .s {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+
+        .error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+            padding: 12px 14px;
+            border-radius: 10px;
+            margin-top: 14px;
+            display: none;
+            white-space: pre-wrap;
+        }
+
+        .loading {
+            display: none;
+            margin-top: 16px;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #111827;
+            animation: blink 1s infinite alternate;
+            margin-right: 6px;
+        }
+
+        @keyframes blink {
+            from {
+                opacity: .2;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, .45);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 50;
+        }
+
+        .modal.open {
+            display: flex;
+        }
+
+        .modal-box {
+            width: 100%;
+            max-width: 680px;
+            background: #fff;
+            border-radius: 16px;
+            border: 1px solid #e5e7eb;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, .18);
+        }
+
+        .modal-head,
+        .modal-path,
+        .foot {
+            display: flex;
+            align-items: center;
+        }
+
+        .modal-head {
+            padding: 14px 16px;
+            border-bottom: 1px solid #e5e7eb;
+            justify-content: space-between;
+        }
+
+        .modal-head strong {
+            font-size: 14px;
+        }
+
+        .modal-path {
+            gap: 8px;
+            padding: 12px 16px;
+            background: #f9fafb;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .modal-path input {
+            flex: 1;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            padding: 8px 10px;
+            font-family: ui-monospace, Menlo, monospace;
+            font-size: 13px;
+        }
+
+        .list {
+            max-height: 360px;
+            overflow: auto;
+        }
+
+        .item {
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .item:hover {
+            background: #f9fafb;
+        }
+
+        .item .ic {
+            width: 22px;
+            text-align: center;
+        }
+
+        .foot {
+            padding: 12px 16px;
+            justify-content: space-between;
+            background: #fff;
+        }
+
+        .foot-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .badge {
+            font-size: 11px;
+            background: #eef2ff;
+            color: #4338ca;
+            border-radius: 999px;
+            padding: 3px 8px;
+        }
+
+        .empty {
+            padding: 18px;
+            text-align: center;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="card">
+        <div class="row">
+            <button id="pickBtn" class="btn btn-secondary">📁 Select Directory</button>
+            <div id="pathView" class="path muted">No directory selected</div>
+            <button id="scanBtn" class="btn btn-primary" disabled>Scan</button>
+        </div>
+    </div>
+
+    <div id="err" class="error"></div>
+    <div id="loading" class="loading"><span class="dot"></span>Scanning .java files recursively...</div>
+
+    <div id="dash" class="dashboard">
+        <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+                <div><strong>Results</strong> <span id="rootLabel" class="muted"></span></div>
+                <span id="timeBadge" class="badge"></span>
+            </div>
+
+            <div id="noFiles" class="empty" style="display:none">
+                No <code>.java</code> files found in this directory. Try another root.
+            </div>
+
+            <div id="stats" class="stats"></div>
+        </div>
+    </div>
+</div>
+
+<div id="modal" class="modal">
+    <div class="modal-box">
+        <div class="modal-head">
+            <strong>Choose root directory</strong>
+            <button id="closeModal" class="btn btn-secondary" style="padding:6px 10px">✕</button>
+        </div>
+
+        <div class="modal-path">
+            <input id="modalInput" placeholder="/home/user/projects or C:\projects">
+            <button id="goBtn" class="btn btn-secondary" style="padding:8px 12px">Go</button>
+        </div>
+
+        <div class="list" id="dirList"></div>
+
+        <div class="foot">
+            <button id="upBtn" class="btn btn-secondary">⬆ Up</button>
+            <div class="foot-actions">
+                <button id="cancelBtn" class="btn btn-secondary">Cancel</button>
+                <button id="selectBtn" class="btn btn-primary">Select This Folder</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let selectedPath = "";
+    let modalPath = "";
+    let modalParent = "";
+
+    const $ = id => document.getElementById(id);
+    const pickBtn = $("pickBtn");
+    const scanBtn = $("scanBtn");
+    const pathView = $("pathView");
+    const modal = $("modal");
+    const dirList = $("dirList");
+    const modalInput = $("modalInput");
+    const errBox = $("err");
+    const loading = $("loading");
+    const dash = $("dash");
+
+    function showError(message) {
+        errBox.textContent = message;
+        errBox.style.display = "block";
+    }
+
+    function clearError() {
+        errBox.textContent = "";
+        errBox.style.display = "none";
+    }
+
+    function fmtSize(bytes) {
+        if (bytes < 1024) return `${bytes} B`;
+        if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(2)} KB`;
+        return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+    }
+
+    const fmtNum = n => Number(n).toLocaleString();
+
+    async function fetchList(path = "") {
+        const res = await fetch(`/api/list?path=${encodeURIComponent(path)}`);
+        return res.json();
+    }
+
+    async function openPicker() {
+        clearError();
+        try {
+            renderPicker(await fetchList(selectedPath));
+            modal.classList.add("open");
+        } catch (e) {
+            showError(`Failed to list directories: ${e.message}`);
+        }
+    }
+
+    function renderPicker(data) {
+        if (data.error) {
+            showError(data.error);
+            return;
+        }
+
+        modalPath = data.current;
+        modalParent = data.parent;
+        modalInput.value = modalPath;
+        $("upBtn").disabled = !modalParent;
+        dirList.innerHTML = "";
+
+        if (!data.dirs?.length) {
+            dirList.innerHTML = '<div class="empty">No subdirectories</div>';
+            return;
+        }
+
+        data.dirs.forEach(name => {
+            const item = document.createElement("div");
+            item.className = "item";
+            item.innerHTML = `<span class="ic">📁</span><span>${name}</span>`;
+            item.onclick = async () => renderPicker(await fetchList(`${modalPath}${data.sep}${name}`));
+            dirList.appendChild(item);
+        });
+    }
+
+    async function goToInputPath() {
+        const path = modalInput.value.trim();
+        if (!path) return;
+
+        const data = await fetchList(path);
+        if (data.error) {
+            showError(data.error);
+            return;
+        }
+
+        renderPicker(data);
+    }
+
+    function closePicker() {
+        modal.classList.remove("open");
+    }
+
+    function confirmSelection() {
+        selectedPath = modalPath;
+        pathView.textContent = selectedPath;
+        pathView.classList.remove("muted");
+        scanBtn.disabled = false;
+        closePicker();
+    }
+
+    async function doScan() {
+        if (!selectedPath) {
+            showError("Select a directory first");
+            return;
+        }
+
+        clearError();
+        dash.style.display = "none";
+        loading.style.display = "block";
+        scanBtn.disabled = true;
+
+        try {
+            const res = await fetch("/api/scan", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({path: selectedPath})
+            });
+
+            const data = await res.json();
+            if (data.error) {
+                showError(data.error);
+                return;
+            }
+
+            renderResults(data);
+        } catch (e) {
+            showError(`Scan failed: ${e.message}`);
+        } finally {
+            loading.style.display = "none";
+            scanBtn.disabled = false;
+        }
+    }
+
+    function renderResults(data) {
+        dash.style.display = "block";
+        $("rootLabel").textContent = `— ${data.root}`;
+        $("timeBadge").textContent = `scan time ${data.scanTimeStr}`;
+
+        if (data.totalFiles === 0) {
+            $("noFiles").style.display = "block";
+            $("stats").innerHTML = "";
+            return;
+        }
+
+        $("noFiles").style.display = "none";
+
+        const items = [
+            ["Total Java files", fmtNum(data.totalFiles)],
+            ["Total lines", fmtNum(data.totalLines)],
+            ["Total chars (with spaces)", fmtNum(data.charsInc)],
+            ["Total chars (without whitespace)", fmtNum(data.charsExc)],
+            ["Total blank lines", fmtNum(data.blankLines)],
+            ["Total non-blank lines", fmtNum(data.nonBlankLines)],
+            ["Total Java source size", fmtSize(data.totalSize), `${data.totalSize} bytes`],
+            ["Scanning time", data.scanTimeStr, `${data.scanTimeMs} ms`]
+        ];
+
+        $("stats").innerHTML = items.map(([key, value, sub]) => `
+            <div class="stat">
+                <div class="k">${key}</div>
+                <div class="v">${value}</div>
+                ${sub ? `<div class="s">${sub}</div>` : ""}
+            </div>
+        `).join("");
+    }
+
+    pickBtn.onclick = openPicker;
+    $("closeModal").onclick = closePicker;
+    $("cancelBtn").onclick = closePicker;
+    $("selectBtn").onclick = confirmSelection;
+    $("goBtn").onclick = goToInputPath;
+
+    $("upBtn").onclick = async () => {
+        if (modalParent) renderPicker(await fetchList(modalParent));
+    };
+
+    modal.onclick = e => {
+        if (e.target === modal) closePicker();
+    };
+
+    modalInput.onkeydown = e => {
+        if (e.key === "Enter") goToInputPath();
+    };
+
+    scanBtn.onclick = doScan;
+</script>
+</body>
+</html>
