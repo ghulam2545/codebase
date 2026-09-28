@@ -19,3 +19,7 @@ Then open:
 ```text
 http://localhost:8080
 ```
+
+### Screenshot
+![page.png](out/page.png)
+![page-2.png](out/page-2.png)
